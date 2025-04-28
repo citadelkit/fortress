@@ -18,7 +18,7 @@ Route::prefix('post')
         Route::get('/', [PostController::class, 'index'])->name('index');
         Route::get('/create', [PostController::class, 'create'])->name('create');
         Route::post('/store', [PostController::class, 'store'])->name('store');
-        Route::get('/{post}/edit', [PostController::class, 'edit'])->name('edit');
-        Route::post('/{post}/update', [PostController::class, 'update'])->name('update');
-        Route::post('/{post}/destroy', [PostController::class, 'destroy'])->name('destroy');
+        Route::get('/{id}/edit', [PostController::class, 'edit'])->name('edit');
+        Route::post('/{id}/update', [PostController::class, 'update'])->name('update');
+        Route::post('/{id}/destroy', [PostController::class, 'destroy'])->name('destroy');
     });

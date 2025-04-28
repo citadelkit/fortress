@@ -8,5 +8,5 @@
         </div>
     </div>
     <hr>
-    <textarea name="body" id="" cols="30" rows="30" class="summer"></textarea>
+    <textarea name="body" id="" cols="30" rows="30" class="summer">{!! $model->body !!}</textarea>
 </div>
