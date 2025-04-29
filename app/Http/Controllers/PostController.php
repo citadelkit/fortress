@@ -159,7 +159,8 @@ class PostController extends Controller
             SweetAlert::make('success', 'Success')
                 ->content("Berhasil Edit Post")
                 ->type('success')
-                ->afterConfirm('reload')
+                ->route('post.index')
+                // ->afterConfirm('reload')
         );
 
 
@@ -247,7 +248,8 @@ class PostController extends Controller
             SweetAlert::make('success', 'Success')
                 ->content("Berhasil Edit Post")
                 ->type('success')
-                ->afterConfirm(route('post.index'))
+                ->route('post.index')
+                // ->afterConfirm('reload')
         );
 
         return redirect()->route('post.index');
