@@ -3,8 +3,8 @@
 return [
     // Citadel Developer control "build" or "development"
     // "build" for end user (default)
-    // "development" for developer 
-    'mode' => 'build',
+    // "development" for developer
+    'mode' => 'development',
     'views' => [
         'page' => "citadel-template::core"
     ],

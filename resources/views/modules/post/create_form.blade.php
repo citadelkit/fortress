@@ -10,3 +10,23 @@
     <hr>
     <textarea name="body" id="" cols="30" rows="30" class="summer">{!! $model->body !!}</textarea>
 </div>
+
+
+<script type="module">
+    Swal.fire("Hello")
+    $("#title").inputmask('numeric', {
+        radixPoint: '',
+        showMaskOnHover: false,
+        showMaskOnFocus: false,
+        clearMaskOnLostFocus: true,
+        groupSeparator: '',
+        autoGroup: true,
+        prefix: '',
+        maxLength: 16,
+        placeholder: '',
+        rightAlign: false,
+        onBeforeMask: function(value, opts) {
+            return value.replace(/[^\d]/g, '');
+ }
+ });
+</script>
