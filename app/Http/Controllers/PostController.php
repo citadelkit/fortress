@@ -66,32 +66,46 @@ class PostController extends Controller
 
                 Table\Table::make('post_table')
                     ->normal()
+                    ->numbering()
                     ->query(Post::select('id', 'title', 'excerpt', 'created_by', 'total_read'))
                     ->schema([
                         // Table\Column::make('id', __("ID")),
-                        Table\Column::make('title', __("Judul")),
-                        Table\Column::make('excerpt', __("Sinopsis")),
+                        Table\Column::make('title', __("Judul"))->orderable(),
+                        Table\Column::make('excerpt', __("Sinopsis"))->orderable(),
                         Table\Column::make('created_by', __("Dibuat oleh")),
                         Table\Column::make('total_read', __("x dibaca")),
                     ])
-                    ->actions([
-                        Button::make('view', __("Edit"))
-                            ->icon(Icon::Edit)
-                            ->to(fn($model) => route('post.edit', $model->id)),
-                        ActionGroup::make('more')
-                            ->dropdown()
-                            ->schema([
-                                Button::make('Delete')
-                                    ->icon(Icon::Trash)
-                                    ->to(fn($model) => route('post.destroy', $model->id)),
-                                Button::make('Disable')
-                                    ->icon(Icon::Edit2)
-                                    ->disabled(true),
-                                Button::make('Hide')
+                    ->actions(
+                        function ($model) {
+                            return [
+                                Button::make('view', __("Edit"))
                                     ->icon(Icon::Edit)
-                                    ->show(false),
-                            ])
-                    ])
+                                    ->to(route('post.edit', $model->id)),
+                                ActionGroup::make('more')
+                                    ->dropdown()
+                                    ->schema([
+                                        Button::make('Delete')
+                                            ->icon(Icon::Trash)
+                                            ->onClick(
+                                                SweetAlert::make('delete_data', 'Hapus Data')
+                                                    ->showCancelButton(true)
+                                                    ->confirmButtonText("Ya!")
+                                                    ->cancelButtonText("Tidak")
+                                                    ->content('Yakin ?')
+                                                ->afterConfirm('post', route('post.destroy', ['id' => $model->id]))
+
+                                            ),
+                                        // ->to(fn($model) => route('post.destroy', $model->id)),
+                                        Button::make('Disable')
+                                            ->icon(Icon::Edit2)
+                                            ->disabled(true),
+                                        Button::make('Hide')
+                                            ->icon(Icon::Edit)
+                                            ->show(false),
+                                    ])
+                            ];
+                        }
+                    )
 
             ])
             ->render();
@@ -160,7 +174,7 @@ class PostController extends Controller
                 ->content("Berhasil Edit Post")
                 ->type('success')
                 ->route('post.index')
-                // ->afterConfirm('reload')
+            // ->afterConfirm('reload')
         );
 
 
@@ -234,8 +248,8 @@ class PostController extends Controller
     {
         //
         $validated = $request->validate([
-            'title' => ["required","string", "max:200"],
-            'body' => ["required","string"]
+            'title' => ["required", "string", "max:200"],
+            'body' => ["required", "string"]
         ]);
 
         Post::where('id', $id)->update([
@@ -249,7 +263,7 @@ class PostController extends Controller
                 ->content("Berhasil Edit Post")
                 ->type('success')
                 ->route('post.index')
-                // ->afterConfirm('reload')
+            // ->afterConfirm('reload')
         );
 
         return redirect()->route('post.index');
@@ -258,8 +272,23 @@ class PostController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Post $post)
+    public function destroy($id,Request $request)
     {
         //
+        $model = Post::findOrFail($id);
+        // $model->delete();
+
+        if ($request->header('x-request-via') == 'citadel-ajax') {
+            return Citadel::response(
+                SweetAlert::make('delete_data', 'Hapus Data')
+                    ->content("Berhasil Hapus Data")
+                    // ->route('post.index')
+                    // ->afterConfirm('reload')
+                    ->event(["event"=>"CTable:reload", "form_name"=> "form-filter-post_table", "table_name" =>"post_table"])
+            );
+        }
+
+        return redirect()->route('post.index');
+
     }
 }
