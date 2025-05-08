@@ -70,8 +70,8 @@ class PostController extends Controller
                     ->query(Post::select('id', 'title', 'excerpt', 'created_by', 'total_read'))
                     ->schema([
                         // Table\Column::make('id', __("ID")),
-                        Table\Column::make('title', __("Judul"))->orderable(),
-                        Table\Column::make('excerpt', __("Sinopsis"))->orderable(),
+                        Table\Column::make('title', __("Judul"))->searchable()->orderable(),
+                        Table\Column::make('excerpt', __("Sinopsis"))->searchable()->orderable(),
                         Table\Column::make('created_by', __("Dibuat oleh")),
                         Table\Column::make('total_read', __("x dibaca")),
                     ])
