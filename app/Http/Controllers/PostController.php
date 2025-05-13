@@ -35,6 +35,10 @@ class PostController extends Controller
         return Page::make('All Post')
             // ->alt1()
             ->sidebar(view('menu.admin'))
+            ->business(function () {
+                $query = Post::select('id', 'title', 'excerpt', 'created_by', 'total_read');
+                return compact('query');
+            })
             ->schema([
                 Wrapper::make('Header')
                     ->columns(4)
@@ -66,8 +70,9 @@ class PostController extends Controller
 
                 Table\Table::make('post_table')
                     ->normal()
+                    ->filters([])
                     ->numbering()
-                    ->query(Post::select('id', 'title', 'excerpt', 'created_by', 'total_read'))
+                    ->query(fn($query) => $query)
                     ->schema([
                         // Table\Column::make('id', __("ID")),
                         Table\Column::make('title', __("Judul"))->searchable()->orderable(),
@@ -92,7 +97,7 @@ class PostController extends Controller
                                                     ->confirmButtonText("Ya!")
                                                     ->cancelButtonText("Tidak")
                                                     ->content('Yakin ?')
-                                                ->afterConfirm('post', route('post.destroy', ['id' => $model->id]))
+                                                    ->afterConfirm('post', route('post.destroy', ['id' => $model->id]))
 
                                             ),
                                         // ->to(fn($model) => route('post.destroy', $model->id)),
@@ -272,11 +277,11 @@ class PostController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($id,Request $request)
+    public function destroy($id, Request $request)
     {
         //
         $model = Post::findOrFail($id);
-        // $model->delete();
+        $model->delete();
 
         if ($request->header('x-request-via') == 'citadel-ajax') {
             return Citadel::response(
@@ -284,11 +289,118 @@ class PostController extends Controller
                     ->content("Berhasil Hapus Data")
                     // ->route('post.index')
                     // ->afterConfirm('reload')
-                    ->event(["event"=>"CTable:reload", "form_name"=> "form-filter-post_table", "table_name" =>"post_table"])
+                    ->event(["event" => "CTable:reload", "form_name" => "form-filter-post_table", "table_name" => "post_table"])
             );
         }
 
         return redirect()->route('post.index');
+    }
 
+    public function arrayTest()
+    {
+        return Page::make('All Post')
+            // ->alt1()
+            ->sidebar(view('menu.admin'))
+            ->business(function () {
+                // $query = Post::select('id', 'title', 'excerpt', 'created_by', 'total_read');
+                $query = [
+                    ["title" => "The Rise of Laravel", "excerpt" => "A deep dive into Laravel's popularity.", "created_by" => 1, "total_read" => 120],
+                    ["title" => "Vue.js in Practice", "excerpt" => "Examples and use cases for Vue.js.", "created_by" => 1, "total_read" => 95],
+                    ["title" => "Mastering Tailwind CSS", "excerpt" => "Quick tips to design faster.", "created_by" => 1, "total_read" => 80],
+                    ["title" => "JavaScript Async Explained", "excerpt" => "Understanding async/await in JavaScript.", "created_by" => 1, "total_read" => 140],
+                    ["title" => "Clean Code in PHP", "excerpt" => "How to keep your PHP code clean and maintainable.", "created_by" => 1, "total_read" => 110],
+                    ["title" => "React vs Vue", "excerpt" => "Comparing two popular frontend frameworks.", "created_by" => 1, "total_read" => 150],
+                    ["title" => "MySQL Optimization", "excerpt" => "Improve your database performance.", "created_by" => 1, "total_read" => 75],
+                    ["title" => "Building REST APIs", "excerpt" => "Designing clean and scalable APIs.", "created_by" => 1, "total_read" => 130],
+                    ["title" => "Intro to MongoDB", "excerpt" => "Learn NoSQL with MongoDB.", "created_by" => 1, "total_read" => 90],
+                    ["title" => "Java for Backend", "excerpt" => "Using Java and Spring Boot for APIs.", "created_by" => 1, "total_read" => 85],
+                    ["title" => "Docker Basics", "excerpt" => "Get started with containerized development.", "created_by" => 1, "total_read" => 100],
+                    ["title" => "Debugging in Laravel", "excerpt" => "How to find and fix bugs efficiently.", "created_by" => 1, "total_read" => 105],
+                    ["title" => "API Security Essentials", "excerpt" => "Protect your endpoints with best practices.", "created_by" => 1, "total_read" => 115],
+                    ["title" => "Testing with PHPUnit", "excerpt" => "Write better tests for your PHP code.", "created_by" => 1, "total_read" => 88],
+                    ["title" => "Deploying with GitHub Actions", "excerpt" => "Automate deployments using CI/CD pipelines.", "created_by" => 1, "total_read" => 92],
+                ];
+
+                return compact('query');
+            })
+            ->schema([
+                Wrapper::make('Header')
+                    ->columns(4)
+                    ->schema([
+                        HeaderText::make('hd:allPost', 'All Post')
+                            ->colspan(3)
+                            ->class("text-white"),
+                    ]),
+                Wrapper::make('Widget')
+                    ->columns(4)
+                    ->schema([
+                        Widget::make('Dibaca')
+                            ->setReactive(function () {
+                                return '';
+                            })
+                            ->color(Gradient::SUNSET),
+                    ]),
+                Wrapper::make('header-action')
+                    // ->columns(4)
+                    ->schema([
+                        Wrapper::make('action')
+                            ->flex('justify-content: end')
+                            ->schema([
+                                Button::make('create', __('New Post'))
+                                    ->icon(Icon::PlusCircle)
+                                    ->route('post.create')
+                            ])
+                    ]),
+
+                Table\Table::make('post_table')
+                    ->normal()
+                    ->filters([])
+                    // ->numbering()
+                    ->array(fn($query) => $query)
+                    ->schema([
+                        // Table\Column::make('id', __("ID")),
+                        Table\Column::make('title', __("Judul"))
+                            ->searchable()
+                            ->orderable(),
+                        Table\Column::make('excerpt', __("Sinopsis"))
+                            ->searchable()
+                            ->orderable(),
+                        Table\Column::make('created_by', __("Dibuat oleh")),
+                        Table\Column::make('total_read', __("x dibaca")),
+                    ])
+                // ->actions(
+                //     function ($model) {
+                //         return [
+                //             Button::make('view', __("Edit"))
+                //                 ->icon(Icon::Edit)
+                //                 ->to(route('post.edit', $model->id)),
+                //             ActionGroup::make('more')
+                //                 ->dropdown()
+                //                 ->schema([
+                //                     Button::make('Delete')
+                //                         ->icon(Icon::Trash)
+                //                         ->onClick(
+                //                             SweetAlert::make('delete_data', 'Hapus Data')
+                //                                 ->showCancelButton(true)
+                //                                 ->confirmButtonText("Ya!")
+                //                                 ->cancelButtonText("Tidak")
+                //                                 ->content('Yakin ?')
+                //                             ->afterConfirm('post', route('post.destroy', ['id' => $model->id]))
+
+                //                         ),
+                //                     // ->to(fn($model) => route('post.destroy', $model->id)),
+                //                     Button::make('Disable')
+                //                         ->icon(Icon::Edit2)
+                //                         ->disabled(true),
+                //                     Button::make('Hide')
+                //                         ->icon(Icon::Edit)
+                //                         ->show(false),
+                //                 ])
+                //         ];
+                //     }
+                // )
+
+            ])
+            ->render();
     }
 }
