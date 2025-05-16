@@ -17,6 +17,7 @@ Route::prefix('post')
     ->group(function () {
         Route::get('/', [PostController::class, 'index'])->name('index');
         Route::get('/array-test', [PostController::class, 'arrayTest'])->name('array_test');
+        Route::get('/tab-direction', [PostController::class, 'tabDirection'])->name('tab_direction');
         Route::get('/create', [PostController::class, 'create'])->name('create');
         Route::post('/store', [PostController::class, 'store'])->name('store');
         Route::get('/{id}/edit', [PostController::class, 'edit'])->name('edit');

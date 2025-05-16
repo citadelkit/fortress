@@ -6,6 +6,7 @@ use App\Models\Post;
 use Illuminate\Http\Request;
 use Citadel\Components\Layout\Form;
 use Citadel\Components\Layout\Card;
+use Citadel\Components\Form\TextArea;
 use Citadel\Components\Layout\CustomView;
 use Citadel\Components\Page;
 use Citadel\Components\Table;
@@ -21,6 +22,9 @@ use Citadel\Components\Control\SweetAlert;
 use Citadel\Citadel;
 use Citadel\Components\Layout\Accordions;
 use Citadel\Components\Layout\Accordion;
+use Citadel\Components\Layout\Tabs;
+use Citadel\Components\Layout\Tab;
+
 
 
 
@@ -45,7 +49,8 @@ class PostController extends Controller
                     ->schema([
                         HeaderText::make('hd:allPost', 'All Post')
                             ->colspan(3)
-                            ->class("text-white"),
+                            ->textClass('text-primary'),
+                        // ->class("text-white"),
                     ]),
                 Wrapper::make('Widget')
                     ->columns(4)
@@ -402,5 +407,63 @@ class PostController extends Controller
 
             ])
             ->render();
+    }
+
+    public function tabDirection()
+    { {
+            return Page::make('All Post')
+                // ->alt1()
+                ->sidebar(view('menu.admin'))
+                ->schema([
+                    Wrapper::make('header')
+                        ->columns(4)
+                        ->schema([
+                            HeaderText::make('hd:createPost', 'Create Post')
+                                ->colspan(3)
+                                ->class("text-white"),
+                            Wrapper::make('action')
+                                ->flex('justify-content: end')
+                                ->schema([
+                                    Button::make('create', __('Submit'))
+                                        ->icon(Icon::Save)
+                                        ->onClick(
+                                            FormSubmitEvent::form('main_form')
+                                                ->to(route('post.store'))
+                                                ->default()
+                                        )
+                                        ->route('post.create')
+                                ])
+                        ]),
+                    Form::make('main_form')
+                        ->schema([
+                            Card::make('New Post')
+                                // ->noHeader()
+                                ->schema([
+                                    Tabs::make('Tabs-bp-row')
+                                        ->direction('row')
+                                        ->schema([
+                                            Tab::make('history', 'Riwayat Aktivitas')
+                                                ->view('modules.post.create_form', ['model' => optional()]),
+                                            Tab::make('history2', 'Riwayat Aktivitas2')
+                                                ->view('modules.post.create_form', ['model' => optional()]),
+
+                                        ]),
+                                    Tabs::make('Tabs-bp-column')
+                                        ->direction('column')
+                                        ->schema([
+                                            Tab::make('history3', 'Riwayat Aktivitas 3')
+                                                ->view('modules.post.create_form', ['model' => optional()]),
+                                            Tab::make('history4', 'Riwayat Aktivitas4 ')
+                                                ->view('modules.post.create_form', ['model' => optional()]),
+                                        ]),    
+                                    // CustomView::make('primary')
+                                    //     ->view('modules.post.vertical-tabs', ['model' => optional()]),
+                                ]),
+
+                        ])
+
+                ])
+                ->render();
+        }
     }
 }
